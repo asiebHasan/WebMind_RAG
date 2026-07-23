@@ -16,7 +16,7 @@ export async function getJobStatus(jobId) {
   return res.json();
 }
 
-export async function askQuestion(question, urls = null, topK = 5) {
+export async function askQuestion(question, urls = null, topK = 10) {
   const res = await fetch(`${API_BASE}/ask`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

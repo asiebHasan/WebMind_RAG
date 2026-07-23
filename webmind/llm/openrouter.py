@@ -11,13 +11,19 @@ def _get_client() -> AsyncOpenAI:
         _client = AsyncOpenAI(
             api_key=settings.openrouter_api_key,
             base_url="https://openrouter.ai/api/v1",
+            timeout=60.0,
         )
     return _client
 
 
-RAG_PROMPT = """You are a helpful assistant that answers questions based on the provided context.
-Always cite the source URL when possible. If the context doesn't contain enough information,
-say so honestly.
+RAG_PROMPT = """You are a helpful assistant that answers questions using the provided context.
+
+Rules:
+- Synthesize information from ALL provided sources to give a comprehensive answer.
+- For summaries, combine insights from every source chunk — extract key topics, themes, and details.
+- Always cite source URLs where relevant using [Source N] notation.
+- If the context is limited, work with what you have — give the best answer possible from the available information.
+- Only say you cannot answer if the context is completely unrelated to the question.
 
 Context:
 {context}
@@ -43,6 +49,6 @@ async def generate_answer(question: str, sources: list[dict]) -> str:
             {"role": "user", "content": RAG_PROMPT.format(context=context, question=question)},
         ],
         temperature=0.3,
-        max_tokens=1024,
+        max_tokens=2048,
     )
     return response.choices[0].message.content

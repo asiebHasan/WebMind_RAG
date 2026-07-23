@@ -1,19 +1,47 @@
+import ipaddress
 import re
 from urllib.parse import urljoin, urlparse
 
 import httpx
 from bs4 import BeautifulSoup
 
+BLOCKED_NETWORKS = [
+    ipaddress.ip_network("127.0.0.0/8"),
+    ipaddress.ip_network("10.0.0.0/8"),
+    ipaddress.ip_network("172.16.0.0/12"),
+    ipaddress.ip_network("192.168.0.0/16"),
+    ipaddress.ip_network("169.254.0.0/16"),
+    ipaddress.ip_network("::1/128"),
+]
 
-def is_valid_url(url: str) -> bool:
+
+def is_safe_url(url: str) -> bool:
     parsed = urlparse(url)
-    return parsed.scheme in ("http", "https") and bool(parsed.netloc)
+    if parsed.scheme not in ("http", "https"):
+        return False
+    if not parsed.netloc:
+        return False
+    # Block localhost variants
+    hostname = parsed.hostname or ""
+    if hostname in ("localhost", "127.0.0.1", "::1", "0.0.0.0"):
+        return False
+    # Block private IPs
+    try:
+        ip = ipaddress.ip_address(hostname)
+        for net in BLOCKED_NETWORKS:
+            if ip in net:
+                return False
+    except ValueError:
+        # Not an IP address, that's fine (it's a domain)
+        pass
+    return True
 
 
 def normalize_url(url: str, base_url: str) -> str | None:
     url = urljoin(base_url, url)
-    url = url.split("#")[0].split("?")[0].rstrip("/")
-    if not is_valid_url(url):
+    # Keep query params for dedup but strip fragments
+    url = url.split("#")[0].rstrip("/")
+    if not is_safe_url(url):
         return None
     return url
 
@@ -23,10 +51,9 @@ async def crawl(
     max_depth: int = 3,
     max_pages: int = 50,
 ) -> list[dict]:
-    """Recursively crawl a site starting from seed_url.
+    if not is_safe_url(seed_url):
+        raise ValueError(f"URL not allowed: {seed_url}")
 
-    Returns list of dicts: {"url": str, "title": str, "text": str}
-    """
     base_domain = urlparse(seed_url).netloc
     visited: set[str] = set()
     results: list[dict] = []

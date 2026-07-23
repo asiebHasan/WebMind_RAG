@@ -26,8 +26,10 @@ async def get_sources():
 
 @router.delete("/{url_id:path}", response_model=DeleteResponse)
 async def remove_source(url_id: str):
+    from urllib.parse import unquote
+    url_id = unquote(url_id)
     all_urls = list_all_urls()
-    matched = [u for u in all_urls if url_id in u]
+    matched = [u for u in all_urls if u == url_id]
     if not matched:
         raise HTTPException(status_code=404, detail="URL not found")
     for u in matched:

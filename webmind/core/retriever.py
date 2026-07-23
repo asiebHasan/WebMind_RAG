@@ -25,7 +25,8 @@ def store_chunks(url: str, chunks: list[dict], embeddings: list[list[float]]) ->
         name=_collection_name(url),
         metadata={"hnsw:space": "cosine"},
     )
-    ids = [f"{url}_chunk_{c['metadata']['chunk_index']}" for c in chunks]
+    url_hash = hashlib.sha256(url.encode()).hexdigest()[:8]
+    ids = [f"{url_hash}_c{c['metadata']['chunk_index']}" for c in chunks]
     texts = [c["text"] for c in chunks]
     metadatas = []
     for c in chunks:
