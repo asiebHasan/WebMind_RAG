@@ -69,21 +69,21 @@ export function ChatPanel() {
   };
 
   return (
-    <div className="flex-1 flex h-full">
+    <div className="flex-1 flex min-h-0 min-h-0" style={{ height: 0 }}>
       {/* Session sidebar */}
       <div className="w-52 shrink-0 border-r flex flex-col" style={{ borderColor: 'var(--border)' }}>
         <div className="p-3 border-b" style={{ borderColor: 'var(--border)' }}>
           <button
             onClick={handleNewChat}
-            className="mono text-xs font-semibold w-full px-3 py-2 transition-colors text-left"
-            style={{ background: 'var(--accent)', color: '#000' }}
+            className="mono text-xs font-semibold w-full transition-colors text-left"
+            style={{ background: 'var(--accent)', color: '#000', padding: '8px 12px' }}
           >
             + new
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto min-h-0">
           {sessions.length === 0 && (
-            <p className="mono text-xs p-3" style={{ color: 'var(--text-muted)' }}>
+            <p className="mono text-xs" style={{ color: 'var(--text-muted)', padding: '12px' }}>
               no chats
             </p>
           )}
@@ -91,10 +91,11 @@ export function ChatPanel() {
             <div
               key={s.id}
               onClick={() => { setActiveId(s.id); inputRef.current?.focus(); }}
-              className="group flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors"
+              className="group flex items-center gap-2 cursor-pointer transition-colors"
               style={{
                 color: activeId === s.id ? 'var(--accent)' : 'var(--text-secondary)',
                 borderLeft: activeId === s.id ? '2px solid var(--accent)' : '2px solid transparent',
+                padding: '8px 12px',
               }}
             >
               <span className="mono text-xs truncate flex-1">{s.title}</span>
@@ -110,16 +111,16 @@ export function ChatPanel() {
         </div>
       </div>
 
-      {/* Chat area — centered content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Chat area */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-0" style={{ height: 0 }}>
         {!hasMessages ? (
           /* Centered empty state */
-          <div className="flex-1 flex flex-col items-center justify-center px-6">
+          <div className="flex-1 flex flex-col items-center justify-center" style={{ padding: '0 24px' }}>
             <div className="w-full max-w-lg space-y-5">
               <h1 className="mono text-lg font-semibold text-center" style={{ color: 'var(--text)' }}>
                 webmind
               </h1>
-              <div className="rounded-lg p-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+              <div className="rounded-lg" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '16px' }}>
                 <form onSubmit={handleSend} className="space-y-3">
                   <label className="mono text-xs block" style={{ color: 'var(--text-muted)' }}>
                     question
@@ -130,16 +131,16 @@ export function ChatPanel() {
                     value={input}
                     onChange={e => setInput(e.target.value)}
                     placeholder="ask anything..."
-                    className="w-full mono text-sm bg-transparent focus-ring px-3 py-2"
-                    style={{ color: 'var(--text)', border: '1px solid var(--border)' }}
+                    className="w-full mono text-sm bg-transparent focus-ring"
+                    style={{ color: 'var(--text)', border: '1px solid var(--border)', padding: '8px 12px' }}
                     disabled={loading}
                   />
                   <div className="flex justify-end">
                     <button
                       type="submit"
                       disabled={loading || !input.trim()}
-                      className="mono text-sm font-semibold px-6 py-2 transition-all disabled:opacity-30"
-                      style={{ background: 'var(--accent)', color: '#000' }}
+                      className="mono text-sm font-semibold transition-all disabled:opacity-30"
+                      style={{ background: 'var(--accent)', color: '#000', padding: '8px 24px' }}
                     >
                       send
                     </button>
@@ -149,10 +150,10 @@ export function ChatPanel() {
             </div>
           </div>
         ) : (
-          /* Messages view — centered */
+          /* Messages view — scrollable and centered */
           <>
-            <div ref={scrollRef} className="flex-1 overflow-y-auto">
-              <div className="max-w-2xl mx-auto px-6 py-8 space-y-6">
+            <div ref={scrollRef} className="flex-1 overflow-y-auto min-h-0" style={{ height: 0 }}>
+              <div className="w-full mx-auto space-y-6" style={{ maxWidth: '42rem', padding: '32px 24px' }}>
                 <AnimatePresence>
                   {messages.map((m, i) => (
                     <motion.div
@@ -162,7 +163,7 @@ export function ChatPanel() {
                       transition={{ duration: 0.15 }}
                     >
                       {m.role === 'user' ? (
-                        <div className="mono text-sm py-2" style={{ color: 'var(--text)' }}>
+                        <div className="mono text-sm" style={{ color: 'var(--text)', padding: '8px 0' }}>
                           <span style={{ color: 'var(--accent)' }}>$ </span>
                           {m.text}
                         </div>
@@ -179,7 +180,7 @@ export function ChatPanel() {
                 </AnimatePresence>
 
                 {loading && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 py-2">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2" style={{ padding: '8px 0' }}>
                     <Loader2 size={12} className="animate-spin" style={{ color: 'var(--accent)' }} />
                     <span className="mono text-xs" style={{ color: 'var(--text-muted)' }}>thinking</span>
                   </motion.div>
@@ -188,8 +189,8 @@ export function ChatPanel() {
             </div>
 
             {/* Input at bottom — centered */}
-            <div className="px-6 pb-6 flex justify-center">
-              <div className="w-full max-w-2xl rounded-lg p-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+            <div className="shrink-0 flex justify-center" style={{ padding: '0 24px 24px 24px' }}>
+              <div className="w-full max-w-2xl rounded-lg" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '16px' }}>
                 <form onSubmit={handleSend} className="flex items-center gap-3">
                   <input
                     ref={inputRef}
@@ -197,15 +198,15 @@ export function ChatPanel() {
                     value={input}
                     onChange={e => setInput(e.target.value)}
                     placeholder="ask a follow-up..."
-                    className="flex-1 mono text-sm bg-transparent focus-ring px-3 py-2"
-                    style={{ color: 'var(--text)', border: '1px solid var(--border)' }}
+                    className="flex-1 mono text-sm bg-transparent focus-ring"
+                    style={{ color: 'var(--text)', border: '1px solid var(--border)', padding: '8px 12px' }}
                     disabled={loading}
                   />
                   <button
                     type="submit"
                     disabled={loading || !input.trim()}
-                    className="mono text-sm font-semibold px-6 py-2 transition-all disabled:opacity-30"
-                    style={{ background: 'var(--accent)', color: '#000' }}
+                    className="mono text-sm font-semibold transition-all disabled:opacity-30"
+                    style={{ background: 'var(--accent)', color: '#000', padding: '8px 24px' }}
                   >
                     send
                   </button>

@@ -69,14 +69,14 @@ export default function App() {
       </main>
 
       {/* Bottom tabs */}
-      <div className="h-12 flex items-center justify-center shrink-0 border-t" style={{ borderColor: 'var(--border)' }}>
-        <nav className="flex gap-1">
+      <div className="shrink-0 border-t flex items-center justify-center" style={{ borderColor: 'var(--border)', minHeight: '64px', height: '64px' }}>
+        <nav className="flex gap-2">
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setView(tab.id)}
-              className="mono text-xs px-4 py-2 transition-colors"
-              style={{ color: view === tab.id ? 'var(--accent)' : 'var(--text-muted)' }}
+              className="mono text-sm font-medium px-6 py-3 transition-colors rounded"
+              style={{ color: view === tab.id ? 'var(--accent)' : 'var(--text-muted)', padding: '12px 24px' }}
             >
               {tab.label}
             </button>

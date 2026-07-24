@@ -35,7 +35,7 @@ export function IngestPanel({ onIngested }) {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-6">
+    <div className="flex-1 flex flex-col items-center justify-center" style={{ padding: '0 24px' }}>
       <div className="w-full max-w-lg space-y-5">
         <h1 className="mono text-lg font-semibold text-center" style={{ color: 'var(--text)' }}>
           webmind
