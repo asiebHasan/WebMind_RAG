@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, ExternalLink, Trash2, RefreshCw } from 'lucide-react';
 import { getSources, deleteSource } from '../api';
 

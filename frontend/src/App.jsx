@@ -51,7 +51,7 @@ export default function App() {
       </header>
 
       {/* Content — centered */}
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={view}
@@ -59,7 +59,7 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="flex-1 flex flex-col"
+            style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
           >
             {view === 'ingest' && <IngestPanel onIngested={refreshSources} />}
             {view === 'chat' && <ChatPanel />}

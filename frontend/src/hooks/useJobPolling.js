@@ -3,6 +3,8 @@ import { getJobStatus } from '../api';
 
 export function useJobPolling(jobs, onUpdate) {
   const intervalRefs = useRef({});
+  const onUpdateRef = useRef(onUpdate);
+  onUpdateRef.current = onUpdate;
 
   useEffect(() => {
     jobs.forEach((job) => {
@@ -19,7 +21,7 @@ export function useJobPolling(jobs, onUpdate) {
       intervalRefs.current[job.job_id] = setInterval(async () => {
         try {
           const updated = await getJobStatus(job.job_id);
-          onUpdate(updated);
+          onUpdateRef.current(updated);
           if (updated.status === 'completed' || updated.status === 'failed') {
             clearInterval(intervalRefs.current[updated.job_id]);
             delete intervalRefs.current[updated.job_id];
@@ -35,5 +37,6 @@ export function useJobPolling(jobs, onUpdate) {
       Object.values(intervalRefs.current).forEach(clearInterval);
       intervalRefs.current = {};
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jobs.length]);
 }
