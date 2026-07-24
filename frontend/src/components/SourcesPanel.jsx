@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, ExternalLink, Trash2, Database, RefreshCw } from 'lucide-react';
+import { Loader2, ExternalLink, Trash2, RefreshCw } from 'lucide-react';
 import { getSources, deleteSource } from '../api';
 
 export function SourcesPanel({ onChanged }) {
@@ -34,71 +34,68 @@ export function SourcesPanel({ onChanged }) {
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-6 py-12 space-y-8">
-      {/* Title */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-semibold" style={{ color: 'var(--text)' }}>Sources</h2>
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            {sources.length} URL{sources.length !== 1 ? 's' : ''} ingested
-          </p>
+    <div className="flex-1 flex flex-col items-center justify-center px-6">
+      <div className="w-full max-w-lg space-y-5">
+        <div className="flex items-center justify-between">
+          <h1 className="mono text-lg font-semibold" style={{ color: 'var(--text)' }}>
+            sources
+          </h1>
+          <button
+            onClick={load}
+            disabled={loading}
+            className="text-xs px-2 py-1 transition-colors"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
+          </button>
         </div>
-        <button
-          onClick={load}
-          disabled={loading}
-          className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors hover:bg-[var(--raised)]"
-          style={{ color: 'var(--text-muted)' }}
-        >
-          <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-        </button>
-      </div>
 
-      {/* List */}
-      {loading && sources.length === 0 ? (
-        <div className="flex justify-center py-16">
-          <Loader2 size={20} className="animate-spin" style={{ color: 'var(--text-muted)' }} />
-        </div>
-      ) : sources.length === 0 ? (
-        <div className="text-center py-16">
-          <Database size={40} className="mx-auto mb-4" style={{ color: 'var(--text-muted)', opacity: 0.3 }} />
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>No sources yet. Go to Ingest.</p>
-        </div>
-      ) : (
-        <div className="space-y-1.5">
-          <AnimatePresence>
-            {sources.map((source, i) => (
-              <motion.div
+        <p className="mono text-xs" style={{ color: 'var(--text-muted)' }}>
+          {sources.length} url{sources.length !== 1 ? 's' : ''} ingested
+        </p>
+
+        {loading && sources.length === 0 ? (
+          <div className="py-12 text-center">
+            <Loader2 size={16} className="animate-spin mx-auto" style={{ color: 'var(--accent)' }} />
+          </div>
+        ) : sources.length === 0 ? (
+          <div className="py-12 text-center">
+            <p className="mono text-xs" style={{ color: 'var(--text-muted)' }}>
+              no sources — ingest a url first
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-0">
+            {sources.map((source) => (
+              <div
                 key={source.url}
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, x: -12 }}
-                transition={{ duration: 0.15, delay: i * 0.02 }}
-                className="group flex items-center gap-3 px-4 py-3 rounded-xl transition-colors hover:bg-[var(--surface)]"
+                className="group flex items-center gap-3 py-2 border-b"
+                style={{ borderColor: 'var(--border)' }}
               >
-                <div className="w-2 h-2 rounded-full shrink-0" style={{ background: 'var(--green)' }} />
+                <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: 'var(--green)' }} />
                 <a
                   href={source.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 flex items-center gap-1.5 truncate text-sm hover:underline"
+                  className="mono text-xs truncate flex-1 hover:underline"
                   style={{ color: 'var(--text)' }}
                 >
                   {source.url}
-                  <ExternalLink size={12} className="shrink-0" style={{ color: 'var(--text-muted)' }} />
                 </a>
+                <ExternalLink size={10} className="shrink-0" style={{ color: 'var(--text-muted)' }} />
                 <button
                   onClick={() => handleDelete(source.url)}
                   disabled={deleting === source.url}
-                  className="p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500/10"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1"
                   style={{ color: 'var(--red)' }}
                 >
-                  {deleting === source.url ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                  {deleting === source.url ? <Loader2 size={10} className="animate-spin" /> : <Trash2 size={10} />}
                 </button>
-              </motion.div>
+              </div>
             ))}
-          </AnimatePresence>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

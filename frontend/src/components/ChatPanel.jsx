@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, ExternalLink, ChevronDown, ChevronUp, Send, MessageSquare, Plus, Trash2, Clock } from 'lucide-react';
+import { Loader2, ExternalLink, Trash2 } from 'lucide-react';
 import { askQuestion } from '../api';
 import { getSessions, createSession, getSession, addMessage, deleteSession } from '../chatStore';
 
@@ -17,6 +17,7 @@ export function ChatPanel() {
 
   const activeSession = activeId ? getSession(activeId) : null;
   const messages = activeSession?.messages || [];
+  const hasMessages = messages.length > 0;
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
@@ -59,7 +60,7 @@ export function ChatPanel() {
       const res = await askQuestion(q);
       addMessage(sid, { role: 'ai', text: res.answer, sources: res.sources });
     } catch (err) {
-      addMessage(sid, { role: 'ai', text: `Error: ${err.message}`, sources: [] });
+      addMessage(sid, { role: 'ai', text: `error: ${err.message}`, sources: [] });
     } finally {
       setLoading(false);
       refresh();
@@ -67,150 +68,152 @@ export function ChatPanel() {
     }
   };
 
-  const timeAgo = (iso) => {
-    const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
-    if (mins < 1) return 'now';
-    if (mins < 60) return `${mins}m`;
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `${hrs}h`;
-    return `${Math.floor(hrs / 24)}d`;
-  };
-
   return (
-    <div className="max-w-4xl mx-auto px-6 py-6 flex gap-5" style={{ height: 'calc(100vh - 112px)' }}>
-      {/* Sessions sidebar */}
-      <div className="w-56 shrink-0 flex flex-col rounded-xl overflow-hidden" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <div className="p-3" style={{ borderBottom: '1px solid var(--border)' }}>
+    <div className="flex-1 flex h-full">
+      {/* Session sidebar */}
+      <div className="w-52 shrink-0 border-r flex flex-col" style={{ borderColor: 'var(--border)' }}>
+        <div className="p-3 border-b" style={{ borderColor: 'var(--border)' }}>
           <button
             onClick={handleNewChat}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all hover:brightness-110 active:scale-[0.98]"
-            style={{ background: 'var(--accent)', color: '#fff' }}
+            className="mono text-xs font-semibold w-full px-3 py-2 transition-colors text-left"
+            style={{ background: 'var(--accent)', color: '#000' }}
           >
-            <Plus size={14} />
-            New chat
+            + new
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto p-2 space-y-1">
+        <div className="flex-1 overflow-y-auto">
           {sessions.length === 0 && (
-            <p className="text-xs text-center py-6" style={{ color: 'var(--text-muted)' }}>
-              No conversations
+            <p className="mono text-xs p-3" style={{ color: 'var(--text-muted)' }}>
+              no chats
             </p>
           )}
           {sessions.map(s => (
             <div
               key={s.id}
               onClick={() => { setActiveId(s.id); inputRef.current?.focus(); }}
-              className="group flex items-center gap-2 px-3 py-2.5 rounded-lg cursor-pointer transition-colors"
+              className="group flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors"
               style={{
-                background: activeId === s.id ? 'var(--bg)' : 'transparent',
-                border: activeId === s.id ? '1px solid var(--border)' : '1px solid transparent',
+                color: activeId === s.id ? 'var(--accent)' : 'var(--text-secondary)',
+                borderLeft: activeId === s.id ? '2px solid var(--accent)' : '2px solid transparent',
               }}
             >
-              <MessageSquare size={14} className="shrink-0" style={{ color: activeId === s.id ? 'var(--accent)' : 'var(--text-muted)' }} />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm truncate" style={{ color: activeId === s.id ? 'var(--text)' : 'var(--text-secondary)' }}>
-                  {s.title}
-                </p>
-                <p className="text-xs flex items-center gap-1" style={{ color: 'var(--text-muted)' }}>
-                  <Clock size={9} />{timeAgo(s.createdAt)}
-                </p>
-              </div>
+              <span className="mono text-xs truncate flex-1">{s.title}</span>
               <button
                 onClick={(e) => { e.stopPropagation(); handleDeleteSession(s.id); }}
-                className="p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                className="opacity-0 group-hover:opacity-100 transition-opacity"
                 style={{ color: 'var(--text-muted)' }}
               >
-                <Trash2 size={12} />
+                <Trash2 size={10} />
               </button>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Chat area */}
+      {/* Chat area — centered content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Messages */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-5 pb-4">
-          <AnimatePresence>
-            {messages.map((m, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                {m.role === 'user' ? (
+        {!hasMessages ? (
+          /* Centered empty state */
+          <div className="flex-1 flex flex-col items-center justify-center px-6">
+            <div className="w-full max-w-lg space-y-5">
+              <h1 className="mono text-lg font-semibold text-center" style={{ color: 'var(--text)' }}>
+                webmind
+              </h1>
+              <div className="rounded-lg p-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+                <form onSubmit={handleSend} className="space-y-3">
+                  <label className="mono text-xs block" style={{ color: 'var(--text-muted)' }}>
+                    question
+                  </label>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={input}
+                    onChange={e => setInput(e.target.value)}
+                    placeholder="ask anything..."
+                    className="w-full mono text-sm bg-transparent focus-ring px-3 py-2"
+                    style={{ color: 'var(--text)', border: '1px solid var(--border)' }}
+                    disabled={loading}
+                  />
                   <div className="flex justify-end">
-                    <div
-                      className="max-w-[80%] px-4 py-2.5 rounded-2xl rounded-br-md text-sm leading-relaxed"
-                      style={{ background: 'var(--accent)', color: '#fff' }}
+                    <button
+                      type="submit"
+                      disabled={loading || !input.trim()}
+                      className="mono text-sm font-semibold px-6 py-2 transition-all disabled:opacity-30"
+                      style={{ background: 'var(--accent)', color: '#000' }}
                     >
-                      {m.text}
-                    </div>
+                      send
+                    </button>
                   </div>
-                ) : (
-                  <div className="flex gap-3">
-                    <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-                      <MessageSquare size={14} style={{ color: 'var(--accent)' }} />
-                    </div>
-                    <div className="flex-1 space-y-2 min-w-0">
-                      <div className="px-4 py-3 rounded-2xl rounded-tl-md text-sm leading-relaxed" style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text)' }}>
-                        {m.text}
-                      </div>
-                      {m.sources?.length > 0 && <SourceRefs sources={m.sources} />}
-                    </div>
-                  </div>
-                )}
-              </motion.div>
-            ))}
-          </AnimatePresence>
-
-          {loading && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
-              <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-                <MessageSquare size={14} style={{ color: 'var(--accent)' }} />
+                </form>
               </div>
-              <div className="px-4 py-3 rounded-2xl rounded-tl-md flex items-center gap-2" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-                <Loader2 size={14} className="animate-spin" style={{ color: 'var(--accent)' }} />
-                <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Thinking...</span>
-              </div>
-            </motion.div>
-          )}
-
-          {messages.length === 0 && !loading && (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-                <MessageSquare size={20} style={{ color: 'var(--text-muted)' }} />
-              </div>
-              <p className="text-lg font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Ask anything</p>
-              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Query your ingested sources.</p>
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          /* Messages view — centered */
+          <>
+            <div ref={scrollRef} className="flex-1 overflow-y-auto">
+              <div className="max-w-2xl mx-auto px-6 py-8 space-y-6">
+                <AnimatePresence>
+                  {messages.map((m, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      {m.role === 'user' ? (
+                        <div className="mono text-sm py-2" style={{ color: 'var(--text)' }}>
+                          <span style={{ color: 'var(--accent)' }}>$ </span>
+                          {m.text}
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }}>
+                            {m.text}
+                          </div>
+                          {m.sources?.length > 0 && <SourceRefs sources={m.sources} />}
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
 
-        {/* Input */}
-        <div className="p-3 rounded-xl" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-          <form onSubmit={handleSend} className="flex gap-2 items-center">
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              placeholder="Ask a question..."
-              className="flex-1 px-4 py-2.5 text-sm rounded-lg bg-transparent focus-ring"
-              style={{ color: 'var(--text)' }}
-              disabled={loading}
-            />
-            <button
-              type="submit"
-              disabled={loading || !input.trim()}
-              className="w-10 h-10 flex items-center justify-center rounded-lg transition-all disabled:opacity-30 hover:brightness-110 active:scale-95 focus-ring"
-              style={{ background: 'var(--accent)', color: '#fff' }}
-            >
-              <Send size={16} />
-            </button>
-          </form>
-        </div>
+                {loading && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 py-2">
+                    <Loader2 size={12} className="animate-spin" style={{ color: 'var(--accent)' }} />
+                    <span className="mono text-xs" style={{ color: 'var(--text-muted)' }}>thinking</span>
+                  </motion.div>
+                )}
+              </div>
+            </div>
+
+            {/* Input at bottom — centered */}
+            <div className="px-6 pb-6 flex justify-center">
+              <div className="w-full max-w-2xl rounded-lg p-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+                <form onSubmit={handleSend} className="flex items-center gap-3">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={input}
+                    onChange={e => setInput(e.target.value)}
+                    placeholder="ask a follow-up..."
+                    className="flex-1 mono text-sm bg-transparent focus-ring px-3 py-2"
+                    style={{ color: 'var(--text)', border: '1px solid var(--border)' }}
+                    disabled={loading}
+                  />
+                  <button
+                    type="submit"
+                    disabled={loading || !input.trim()}
+                    className="mono text-sm font-semibold px-6 py-2 transition-all disabled:opacity-30"
+                    style={{ background: 'var(--accent)', color: '#000' }}
+                  >
+                    send
+                  </button>
+                </form>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
@@ -222,33 +225,21 @@ function SourceRefs({ sources }) {
 
   return (
     <div className="space-y-1">
-      <AnimatePresence>
-        {shown.map((s, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.15, delay: i * 0.03 }}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs"
-            style={{ background: 'var(--raised)' }}
-          >
-            <span className="w-5 h-5 rounded flex items-center justify-center text-xs font-bold shrink-0" style={{ background: 'var(--accent-subtle)', color: 'var(--accent)' }}>
-              {i + 1}
-            </span>
-            <a href={s.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 truncate hover:underline" style={{ color: 'var(--accent)' }}>
-              {s.url.length > 45 ? s.url.slice(0, 45) + '...' : s.url}
-              <ExternalLink size={10} className="shrink-0" />
-            </a>
-            <span className="ml-auto font-mono shrink-0" style={{ color: 'var(--text-muted)' }}>
-              {(s.score * 100).toFixed(0)}%
-            </span>
-          </motion.div>
-        ))}
-      </AnimatePresence>
+      {shown.map((s, i) => (
+        <div key={i} className="flex items-center gap-2 text-xs py-1">
+          <span className="mono" style={{ color: 'var(--text-muted)' }}>[{i + 1}]</span>
+          <a href={s.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 truncate hover:underline" style={{ color: 'var(--accent)' }}>
+            <span className="mono">{s.url.length > 50 ? s.url.slice(0, 50) + '...' : s.url}</span>
+            <ExternalLink size={9} />
+          </a>
+          <span className="mono ml-auto shrink-0" style={{ color: 'var(--text-muted)' }}>
+            {(s.score * 100).toFixed(0)}%
+          </span>
+        </div>
+      ))}
       {sources.length > 3 && (
-        <button onClick={() => setOpen(!open)} className="flex items-center gap-1 text-xs px-3 py-1 rounded-lg transition-colors hover:opacity-80" style={{ color: 'var(--text-muted)' }}>
-          {open ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
-          {open ? 'Less' : `+${sources.length - 3} more`}
+        <button onClick={() => setOpen(!open)} className="mono text-xs" style={{ color: 'var(--accent)' }}>
+          {open ? 'less' : `+${sources.length - 3} more`}
         </button>
       )}
     </div>

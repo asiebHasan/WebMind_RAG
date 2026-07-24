@@ -6,9 +6,9 @@ import { ChatPanel } from './components/ChatPanel';
 import { SourcesPanel } from './components/SourcesPanel';
 
 const tabs = [
-  { id: 'ingest', label: 'Ingest' },
-  { id: 'chat', label: 'Chat' },
-  { id: 'sources', label: 'Sources' },
+  { id: 'ingest', label: 'ingest' },
+  { id: 'chat', label: 'chat' },
+  { id: 'sources', label: 'sources' },
 ];
 
 export default function App() {
@@ -30,43 +30,36 @@ export default function App() {
   return (
     <div className="h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
       {/* Header */}
-      <header className="h-14 px-6 flex items-center justify-between shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-        <span className="text-base font-semibold tracking-tight" style={{ fontFamily: 'var(--font-mono)', color: 'var(--text)' }}>
+      <header className="h-12 px-6 flex items-center justify-between shrink-0 border-b" style={{ borderColor: 'var(--border)' }}>
+        <span className="mono text-sm font-semibold" style={{ color: 'var(--text)' }}>
           webmind
         </span>
         <div className="flex items-center gap-3">
           {sourceCount > 0 && (
-            <span className="text-xs px-2.5 py-1 rounded-md" style={{ background: 'var(--surface)', color: 'var(--text-muted)' }}>
-              {sourceCount} source{sourceCount !== 1 ? 's' : ''}
+            <span className="mono text-xs" style={{ color: 'var(--text-muted)' }}>
+              {sourceCount} sources
             </span>
           )}
           <button
             onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
-            className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors hover:bg-[var(--raised)]"
+            className="mono text-xs px-2 py-1 transition-colors"
             style={{ color: 'var(--text-muted)' }}
           >
-            {theme === 'dark' ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
-              </svg>
-            ) : (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
-              </svg>
-            )}
+            {theme === 'dark' ? 'light' : 'dark'}
           </button>
         </div>
       </header>
 
-      {/* Content */}
-      <main className="flex-1 overflow-y-auto">
+      {/* Content — centered */}
+      <main className="flex-1 flex flex-col overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
             key={view}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="flex-1 flex flex-col"
           >
             {view === 'ingest' && <IngestPanel onIngested={refreshSources} />}
             {view === 'chat' && <ChatPanel />}
@@ -76,24 +69,16 @@ export default function App() {
       </main>
 
       {/* Bottom tabs */}
-      <div className="h-14 flex items-center justify-center shrink-0" style={{ borderTop: '1px solid var(--border)' }}>
-        <nav className="flex gap-1 p-1 rounded-xl" style={{ background: 'var(--surface)' }}>
+      <div className="h-12 flex items-center justify-center shrink-0 border-t" style={{ borderColor: 'var(--border)' }}>
+        <nav className="flex gap-1">
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setView(tab.id)}
-              className="relative px-6 py-2 text-sm font-medium rounded-lg transition-colors"
-              style={{ color: view === tab.id ? 'var(--text)' : 'var(--text-muted)' }}
+              className="mono text-xs px-4 py-2 transition-colors"
+              style={{ color: view === tab.id ? 'var(--accent)' : 'var(--text-muted)' }}
             >
-              {view === tab.id && (
-                <motion.div
-                  layoutId="tab"
-                  className="absolute inset-0 rounded-lg"
-                  style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
-                  transition={{ type: 'spring', bounce: 0.15, duration: 0.35 }}
-                />
-              )}
-              <span className="relative z-10">{tab.label}</span>
+              {tab.label}
             </button>
           ))}
         </nav>
