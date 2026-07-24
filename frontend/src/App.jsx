@@ -28,9 +28,9 @@ export default function App() {
   useEffect(() => { refreshSources(); }, []);
 
   return (
-    <div className="h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
       {/* Header */}
-      <header className="h-12 px-6 flex items-center justify-between shrink-0 border-b" style={{ borderColor: 'var(--border)' }}>
+      <header style={{ height: '48px', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, borderBottom: '1px solid var(--border)' }}>
         <span className="mono text-sm font-semibold" style={{ color: 'var(--text)' }}>
           webmind
         </span>
@@ -69,7 +69,7 @@ export default function App() {
       </main>
 
       {/* Bottom tabs */}
-      <div className="shrink-0 border-t flex items-center justify-center" style={{ borderColor: 'var(--border)', minHeight: '64px', height: '64px' }}>
+      <div style={{ flexShrink: 0, borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '64px' }}>
         <nav className="flex gap-2">
           {tabs.map(tab => (
             <button
