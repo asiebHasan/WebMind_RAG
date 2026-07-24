@@ -69,21 +69,20 @@ export function ChatPanel() {
   };
 
   return (
-    <div className="flex-1 flex min-h-0 min-h-0" style={{ height: 0 }}>
+    <div style={{ display: 'flex', height: '100%', minHeight: 0 }}>
       {/* Session sidebar */}
-      <div className="w-52 shrink-0 border-r flex flex-col" style={{ borderColor: 'var(--border)' }}>
-        <div className="p-3 border-b" style={{ borderColor: 'var(--border)' }}>
+      <div style={{ width: '208px', flexShrink: 0, borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ padding: '12px', borderBottom: '1px solid var(--border)' }}>
           <button
             onClick={handleNewChat}
-            className="mono text-xs font-semibold w-full transition-colors text-left"
-            style={{ background: 'var(--accent)', color: '#000', padding: '8px 12px' }}
+            style={{ width: '100%', textAlign: 'left', background: 'var(--accent)', color: '#000', padding: '8px 12px', fontSize: '13px', fontFamily: 'var(--font-mono)', fontWeight: 600, cursor: 'pointer' }}
           >
             + new
           </button>
         </div>
-        <div className="flex-1 overflow-y-auto min-h-0">
+        <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
           {sessions.length === 0 && (
-            <p className="mono text-xs" style={{ color: 'var(--text-muted)', padding: '12px' }}>
+            <p style={{ color: 'var(--text-muted)', padding: '12px', fontSize: '12px', fontFamily: 'var(--font-mono)' }}>
               no chats
             </p>
           )}
@@ -91,18 +90,18 @@ export function ChatPanel() {
             <div
               key={s.id}
               onClick={() => { setActiveId(s.id); inputRef.current?.focus(); }}
-              className="group flex items-center gap-2 cursor-pointer transition-colors"
               style={{
+                display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer',
+                padding: '8px 12px', fontSize: '12px', fontFamily: 'var(--font-mono)',
                 color: activeId === s.id ? 'var(--accent)' : 'var(--text-secondary)',
                 borderLeft: activeId === s.id ? '2px solid var(--accent)' : '2px solid transparent',
-                padding: '8px 12px',
               }}
             >
-              <span className="mono text-xs truncate flex-1">{s.title}</span>
+              <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.title}</span>
               <button
                 onClick={(e) => { e.stopPropagation(); handleDeleteSession(s.id); }}
-                className="opacity-0 group-hover:opacity-100 transition-opacity"
-                style={{ color: 'var(--text-muted)' }}
+                style={{ color: 'var(--text-muted)', opacity: 0, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                className="show-on-hover"
               >
                 <Trash2 size={10} />
               </button>
@@ -112,17 +111,17 @@ export function ChatPanel() {
       </div>
 
       {/* Chat area */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-0" style={{ height: 0 }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, minHeight: 0 }}>
         {!hasMessages ? (
           /* Centered empty state */
-          <div className="flex-1 flex flex-col items-center justify-center" style={{ padding: '0 24px' }}>
-            <div className="w-full max-w-lg space-y-5">
-              <h1 className="mono text-lg font-semibold text-center" style={{ color: 'var(--text)' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 24px' }}>
+            <div style={{ width: '100%', maxWidth: '32rem' }}>
+              <h1 style={{ fontFamily: 'var(--font-mono)', fontSize: '18px', fontWeight: 600, textAlign: 'center', color: 'var(--text)', marginBottom: '20px' }}>
                 webmind
               </h1>
-              <div className="rounded-lg" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '16px' }}>
-                <form onSubmit={handleSend} className="space-y-3">
-                  <label className="mono text-xs block" style={{ color: 'var(--text-muted)' }}>
+              <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', padding: '16px' }}>
+                <form onSubmit={handleSend}>
+                  <label style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>
                     question
                   </label>
                   <input
@@ -131,16 +130,14 @@ export function ChatPanel() {
                     value={input}
                     onChange={e => setInput(e.target.value)}
                     placeholder="ask anything..."
-                    className="w-full mono text-sm bg-transparent focus-ring"
-                    style={{ color: 'var(--text)', border: '1px solid var(--border)', padding: '8px 12px' }}
+                    style={{ width: '100%', fontFamily: 'var(--font-mono)', fontSize: '14px', color: 'var(--text)', border: '1px solid var(--border)', padding: '8px 12px', background: 'transparent', boxSizing: 'border-box' }}
                     disabled={loading}
                   />
-                  <div className="flex justify-end">
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px' }}>
                     <button
                       type="submit"
                       disabled={loading || !input.trim()}
-                      className="mono text-sm font-semibold transition-all disabled:opacity-30"
-                      style={{ background: 'var(--accent)', color: '#000', padding: '8px 24px' }}
+                      style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', fontWeight: 600, background: 'var(--accent)', color: '#000', padding: '8px 24px', border: 'none', borderRadius: '4px', cursor: 'pointer', opacity: loading || !input.trim() ? 0.3 : 1 }}
                     >
                       send
                     </button>
@@ -150,10 +147,10 @@ export function ChatPanel() {
             </div>
           </div>
         ) : (
-          /* Messages view — scrollable and centered */
+          /* Messages view */
           <>
-            <div ref={scrollRef} className="flex-1 overflow-y-auto min-h-0" style={{ height: 0 }}>
-              <div className="w-full mx-auto space-y-6" style={{ maxWidth: '42rem', padding: '32px 24px' }}>
+            <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+              <div style={{ maxWidth: '42rem', margin: '0 auto', padding: '32px 24px' }}>
                 <AnimatePresence>
                   {messages.map((m, i) => (
                     <motion.div
@@ -161,15 +158,16 @@ export function ChatPanel() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.15 }}
+                      style={{ marginBottom: '24px' }}
                     >
                       {m.role === 'user' ? (
-                        <div className="mono text-sm" style={{ color: 'var(--text)', padding: '8px 0' }}>
+                        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', color: 'var(--text)', padding: '8px 0' }}>
                           <span style={{ color: 'var(--accent)' }}>$ </span>
                           {m.text}
                         </div>
                       ) : (
-                        <div className="space-y-3">
-                          <div className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }}>
+                        <div>
+                          <div style={{ fontSize: '14px', lineHeight: 1.6, whiteSpace: 'pre-wrap', color: 'var(--text-secondary)' }}>
                             {m.text}
                           </div>
                           {m.sources?.length > 0 && <SourceRefs sources={m.sources} />}
@@ -180,33 +178,31 @@ export function ChatPanel() {
                 </AnimatePresence>
 
                 {loading && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2" style={{ padding: '8px 0' }}>
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 0' }}>
                     <Loader2 size={12} className="animate-spin" style={{ color: 'var(--accent)' }} />
-                    <span className="mono text-xs" style={{ color: 'var(--text-muted)' }}>thinking</span>
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--text-muted)' }}>thinking</span>
                   </motion.div>
                 )}
               </div>
             </div>
 
-            {/* Input at bottom — centered */}
-            <div className="shrink-0 flex justify-center" style={{ padding: '0 24px 24px 24px' }}>
-              <div className="w-full max-w-2xl rounded-lg" style={{ background: 'var(--surface)', border: '1px solid var(--border)', padding: '16px' }}>
-                <form onSubmit={handleSend} className="flex items-center gap-3">
+            {/* Input at bottom */}
+            <div style={{ flexShrink: 0, padding: '0 24px 24px 24px', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ width: '100%', maxWidth: '42rem', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: '8px', padding: '16px' }}>
+                <form onSubmit={handleSend} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <input
                     ref={inputRef}
                     type="text"
                     value={input}
                     onChange={e => setInput(e.target.value)}
                     placeholder="ask a follow-up..."
-                    className="flex-1 mono text-sm bg-transparent focus-ring"
-                    style={{ color: 'var(--text)', border: '1px solid var(--border)', padding: '8px 12px' }}
+                    style={{ flex: 1, fontFamily: 'var(--font-mono)', fontSize: '14px', color: 'var(--text)', border: '1px solid var(--border)', padding: '8px 12px', background: 'transparent' }}
                     disabled={loading}
                   />
                   <button
                     type="submit"
                     disabled={loading || !input.trim()}
-                    className="mono text-sm font-semibold transition-all disabled:opacity-30"
-                    style={{ background: 'var(--accent)', color: '#000', padding: '8px 24px' }}
+                    style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', fontWeight: 600, background: 'var(--accent)', color: '#000', padding: '8px 24px', border: 'none', borderRadius: '4px', cursor: 'pointer', opacity: loading || !input.trim() ? 0.3 : 1 }}
                   >
                     send
                   </button>
@@ -216,6 +212,11 @@ export function ChatPanel() {
           </>
         )}
       </div>
+
+      <style>{`
+        .show-on-hover { opacity: 0 !important; }
+        div:hover > .show-on-hover { opacity: 1 !important; }
+      `}</style>
     </div>
   );
 }
@@ -225,21 +226,21 @@ function SourceRefs({ sources }) {
   const shown = open ? sources : sources.slice(0, 3);
 
   return (
-    <div className="space-y-1">
+    <div style={{ marginTop: '8px' }}>
       {shown.map((s, i) => (
-        <div key={i} className="flex items-center gap-2 text-xs py-1">
-          <span className="mono" style={{ color: 'var(--text-muted)' }}>[{i + 1}]</span>
-          <a href={s.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 truncate hover:underline" style={{ color: 'var(--accent)' }}>
-            <span className="mono">{s.url.length > 50 ? s.url.slice(0, 50) + '...' : s.url}</span>
-            <ExternalLink size={9} />
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0', fontSize: '12px' }}>
+          <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>[{i + 1}]</span>
+          <a href={s.url} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--accent)', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+            <span style={{ fontFamily: 'var(--font-mono)' }}>{s.url.length > 50 ? s.url.slice(0, 50) + '...' : s.url}</span>
+            <ExternalLink size={9} style={{ flexShrink: 0 }} />
           </a>
-          <span className="mono ml-auto shrink-0" style={{ color: 'var(--text-muted)' }}>
+          <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-muted)', flexShrink: 0 }}>
             {(s.score * 100).toFixed(0)}%
           </span>
         </div>
       ))}
       {sources.length > 3 && (
-        <button onClick={() => setOpen(!open)} className="mono text-xs" style={{ color: 'var(--accent)' }}>
+        <button onClick={() => setOpen(!open)} style={{ fontFamily: 'var(--font-mono)', fontSize: '12px', color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
           {open ? 'less' : `+${sources.length - 3} more`}
         </button>
       )}
