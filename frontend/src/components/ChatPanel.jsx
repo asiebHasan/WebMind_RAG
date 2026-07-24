@@ -126,7 +126,7 @@ export function ChatPanel() {
           </div>
         ) : (
           <>
-            <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', position: 'relative' }}>
+            <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', position: 'relative', paddingBottom: '16px' }}>
               <div style={{ maxWidth: '42rem', margin: '0 auto', padding: '32px 24px' }}>
                 <AnimatePresence>
                   {messages.map((m, i) => (

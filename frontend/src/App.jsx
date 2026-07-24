@@ -30,22 +30,61 @@ export default function App() {
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--bg)' }}>
       {/* Header */}
-      <header style={{ height: '48px', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, borderBottom: '1px solid var(--border)' }}>
+      <header style={{ height: '48px', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <span className="mono text-sm font-semibold" style={{ color: 'var(--text)' }}>
           webmind
         </span>
         <div className="flex items-center gap-3">
-          {sourceCount > 0 && (
-            <span className="mono text-xs" style={{ color: 'var(--text-muted)' }}>
-              {sourceCount} sources
-            </span>
-          )}
           <button
             onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
-            className="mono text-xs px-2 py-1 transition-colors"
-            style={{ color: 'var(--text-muted)' }}
+            style={{
+              width: '52px', height: '28px', borderRadius: '14px', border: 'none', cursor: 'pointer',
+              background: theme === 'dark' ? 'var(--surface)' : 'var(--accent)',
+              position: 'relative', transition: 'background 0.3s ease',
+              boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.3)',
+            }}
           >
-            {theme === 'dark' ? 'light' : 'dark'}
+            <motion.div
+              animate={{ x: theme === 'dark' ? 2 : 24 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              style={{
+                width: '22px', height: '22px', borderRadius: '50%',
+                background: theme === 'dark' ? 'var(--accent)' : '#fff',
+                position: 'absolute', top: '3px', left: '3px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+              }}
+            >
+              <AnimatePresence mode="wait">
+                {theme === 'dark' ? (
+                  <motion.svg
+                    key="moon"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  >
+                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+                  </motion.svg>
+                ) : (
+                  <motion.svg
+                    key="sun"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="4"/>
+                    <path d="M12 2v2"/><path d="M12 20v2"/>
+                    <path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/>
+                    <path d="M2 12h2"/><path d="M20 12h2"/>
+                    <path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>
+                  </motion.svg>
+                )}
+              </AnimatePresence>
+            </motion.div>
           </button>
         </div>
       </header>
@@ -69,7 +108,12 @@ export default function App() {
       </main>
 
       {/* Bottom tabs */}
-      <div style={{ flexShrink: 0, borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '64px' }}>
+      <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px', padding: '0 24px' }}>
+        {sourceCount > 0 && (
+          <span className="mono text-xs" style={{ color: 'var(--text-muted)' }}>
+            {sourceCount} sources
+          </span>
+        )}
         <nav className="flex gap-2">
           {tabs.map(tab => (
             <button
@@ -82,6 +126,7 @@ export default function App() {
             </button>
           ))}
         </nav>
+        <div style={{ width: '80px' }} />
       </div>
     </div>
   );
